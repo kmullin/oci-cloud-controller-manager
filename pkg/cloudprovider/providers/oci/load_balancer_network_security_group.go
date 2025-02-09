@@ -56,6 +56,15 @@ type securityRuleComponents struct {
 	ipFamilies       []string
 }
 
+// getProtocolFromName returns the protocol from the listener name
+func getProtocolFromName(name string) int {
+	v := strings.SplitN(name, "-", 2)
+	if len(v) > 0 && v[0] == "UDP" {
+		return ProtocolUDP
+	}
+	return ProtocolTCP
+}
+
 // generateNsgBackendIngressRules is a helper method to generate the ingress rules for the backend NSG
 func generateNsgBackendIngressRules(
 	logger *zap.SugaredLogger,
@@ -69,14 +78,21 @@ func generateNsgBackendIngressRules(
 	// Additional sourceCIDR rule for NLB only, for source IP preservation
 	ingressRules := []core.SecurityRule{}
 	if isPreserveSource {
-		for _, port := range ports {
+		for name, port := range ports {
 			if port.BackendPort != 0 {
 				for _, sourceCIDR := range sourceCIDRs {
-					nlbRule := makeNsgSecurityRule(core.SecurityRuleDirectionIngress, sourceCIDR, serviceUid, port.BackendPort, core.SecurityRuleSourceTypeCidrBlock)
+					nlbRule := makeNsgSecurityRule(
+						core.SecurityRuleDirectionIngress,
+						sourceCIDR,
+						serviceUid,
+						port.BackendPort,
+						getProtocolFromName(name),
+						core.SecurityRuleSourceTypeCidrBlock,
+					)
 					logger.With(
 						"source", *nlbRule.Source,
-						"destinationPortRangeMin", *nlbRule.TcpOptions.DestinationPortRange.Min,
-						"destinationPortRangeMax", *nlbRule.TcpOptions.DestinationPortRange.Max,
+						"destinationPortRangeMin", port.BackendPort,
+						"destinationPortRangeMax", port.BackendPort,
 					).Debug("Adding node port ingress security rule on backend nsg(s)")
 					ingressRules = append(ingressRules, nlbRule)
 				}
@@ -85,24 +101,38 @@ func generateNsgBackendIngressRules(
 	}
 
 	healthCheckPortFound := false
-	for _, port := range ports {
+	for name, port := range ports {
 		if port.BackendPort != 0 { // Can happen when there are no backends.
-			rule := makeNsgSecurityRule(core.SecurityRuleDirectionIngress, frontendNsgId, serviceUid, port.BackendPort, core.SecurityRuleSourceTypeNetworkSecurityGroup)
+			rule := makeNsgSecurityRule(
+				core.SecurityRuleDirectionIngress,
+				frontendNsgId,
+				serviceUid,
+				port.BackendPort,
+				getProtocolFromName(name),
+				core.SecurityRuleSourceTypeNetworkSecurityGroup,
+			)
 			logger.With(
 				"source", *rule.Source,
-				"destinationPortRangeMin", *rule.TcpOptions.DestinationPortRange.Min,
-				"destinationPortRangeMax", *rule.TcpOptions.DestinationPortRange.Max,
+				"destinationPortRangeMin", port.BackendPort,
+				"destinationPortRangeMax", port.BackendPort,
 			).Debug("Adding node port ingress security rule on backend nsg(s)")
 			ingressRules = append(ingressRules, rule)
 
 		}
 		if !healthCheckPortFound && port.HealthCheckerPort != 0 {
 			healthCheckPortFound = true
-			rule := makeNsgSecurityRule(core.SecurityRuleDirectionIngress, frontendNsgId, serviceUid, port.HealthCheckerPort, core.SecurityRuleSourceTypeNetworkSecurityGroup)
+			rule := makeNsgSecurityRule(
+				core.SecurityRuleDirectionIngress,
+				frontendNsgId,
+				serviceUid,
+				port.HealthCheckerPort,
+				getProtocolFromName(name),
+				core.SecurityRuleSourceTypeNetworkSecurityGroup,
+			)
 			logger.With(
 				"source", *rule.Source,
-				"destinationPortRangeMin", *rule.TcpOptions.DestinationPortRange.Min,
-				"destinationPortRangeMax", *rule.TcpOptions.DestinationPortRange.Max,
+				"destinationPortRangeMin", port.HealthCheckerPort,
+				"destinationPortRangeMax", port.HealthCheckerPort,
 			).Debug("Adding healthcheck node port ingress security rule on backend nsg(s)")
 			ingressRules = append(ingressRules, rule)
 		}
@@ -124,14 +154,21 @@ func generateNsgLoadBalancerIngressRules(
 		return ingressRules
 	}
 
-	for _, port := range ports {
+	for name, port := range ports {
 		if port.ListenerPort != 0 {
 			for _, cidr := range sourceCIDRs {
-				rule := makeNsgSecurityRule(core.SecurityRuleDirectionIngress, cidr, serviceUid, port.ListenerPort, core.SecurityRuleSourceTypeCidrBlock)
+				rule := makeNsgSecurityRule(
+					core.SecurityRuleDirectionIngress,
+					cidr,
+					serviceUid,
+					port.ListenerPort,
+					getProtocolFromName(name),
+					core.SecurityRuleSourceTypeCidrBlock,
+				)
 				logger.With(
 					"source", *rule.Source,
-					"destinationPortRangeMin", *rule.TcpOptions.DestinationPortRange.Min,
-					"destinationPortRangeMax", *rule.TcpOptions.DestinationPortRange.Max,
+					"destinationPortRangeMin", port.ListenerPort,
+					"destinationPortRangeMax", port.ListenerPort,
 				).Debug("Adding load balancer ingress security rule for frontend nsg")
 				ingressRules = append(ingressRules, rule)
 			}
@@ -152,27 +189,41 @@ func generateNsgLoadBalancerEgressRules(logger *zap.SugaredLogger, ports map[str
 	rule := core.SecurityRule{}
 	if len(backendNsgIds) != 0 {
 		healthCheckPortFound := false
-		for _, port := range ports {
+		for name, port := range ports {
 			if port.BackendPort != 0 {
 				for _, backendNsgId := range backendNsgIds {
-					rule = makeNsgSecurityRule(core.SecurityRuleDirectionEgress, backendNsgId, serviceUid, port.BackendPort, core.SecurityRuleSourceTypeNetworkSecurityGroup)
-					egressRules = append(egressRules, rule)
+					rule = makeNsgSecurityRule(
+						core.SecurityRuleDirectionEgress,
+						backendNsgId,
+						serviceUid,
+						port.BackendPort,
+						getProtocolFromName(name),
+						core.SecurityRuleSourceTypeNetworkSecurityGroup,
+					)
 					logger.With(
 						"destination", *rule.Destination,
-						"destinationPortRangeMin", *rule.TcpOptions.DestinationPortRange.Min,
-						"destinationPortRangeMax", *rule.TcpOptions.DestinationPortRange.Max,
+						"destinationPortRangeMin", port.BackendPort,
+						"destinationPortRangeMax", port.BackendPort,
 					).Debug("Adding load balancer egress security rule with backend port on frontend nsg")
+					egressRules = append(egressRules, rule)
 				}
 			}
 			if !healthCheckPortFound && port.HealthCheckerPort != 0 {
 				healthCheckPortFound = true
 				for _, backendNsgId := range backendNsgIds {
-					rule = makeNsgSecurityRule(core.SecurityRuleDirectionEgress, backendNsgId, serviceUid, port.HealthCheckerPort, core.SecurityRuleSourceTypeNetworkSecurityGroup)
+					rule = makeNsgSecurityRule(
+						core.SecurityRuleDirectionEgress,
+						backendNsgId,
+						serviceUid,
+						port.HealthCheckerPort,
+						getProtocolFromName(name),
+						core.SecurityRuleSourceTypeNetworkSecurityGroup,
+					)
 					egressRules = append(egressRules, rule)
 					logger.With(
 						"destination", *rule.Destination,
-						"destinationPortRangeMin", *rule.TcpOptions.DestinationPortRange.Min,
-						"destinationPortRangeMax", *rule.TcpOptions.DestinationPortRange.Max,
+						"destinationPortRangeMin", port.HealthCheckerPort,
+						"destinationPortRangeMax", port.HealthCheckerPort,
 					).Debug("Adding load balancer egress security rule with healthcheck port on frontend nsg")
 				}
 			}
@@ -183,18 +234,34 @@ func generateNsgLoadBalancerEgressRules(logger *zap.SugaredLogger, ports map[str
 }
 
 // makeNsgSecurityRule is a helper method to build the Security Rule using direction, source and sourceType (cidr/nsg)
-func makeNsgSecurityRule(direction core.SecurityRuleDirectionEnum, source string, serviceUid string, port int, sourceType core.SecurityRuleSourceTypeEnum) core.SecurityRule {
+func makeNsgSecurityRule(
+	direction core.SecurityRuleDirectionEnum,
+	source string,
+	serviceUid string,
+	port int,
+	protocol int,
+	sourceType core.SecurityRuleSourceTypeEnum,
+) core.SecurityRule {
 	rule := core.SecurityRule{
 		Description: common.String(serviceUid),
-		Protocol:    common.String(fmt.Sprintf("%d", ProtocolTCP)),
-		TcpOptions: &core.TcpOptions{
-			DestinationPortRange: &core.PortRange{
-				Min: &port,
-				Max: &port,
-			},
-		},
 		IsStateless: common.Bool(false),
 	}
+
+	portRange := &core.PortRange{Min: &port, Max: &port}
+
+	switch protocol {
+	case ProtocolUDP:
+		rule.Protocol = common.String(fmt.Sprintf("%d", ProtocolUDP))
+		rule.UdpOptions = &core.UdpOptions{
+			DestinationPortRange: portRange,
+		}
+	case ProtocolTCP:
+		rule.Protocol = common.String(fmt.Sprintf("%d", ProtocolTCP))
+		rule.TcpOptions = &core.TcpOptions{
+			DestinationPortRange: portRange,
+		}
+	}
+
 	if direction == core.SecurityRuleDirectionEgress {
 		rule.Direction = core.SecurityRuleDirectionEgress
 		rule.Destination = common.String(source)
