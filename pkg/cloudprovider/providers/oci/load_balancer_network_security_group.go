@@ -100,8 +100,11 @@ func generateNsgBackendIngressRules(
 		}
 	}
 
+	logger.Infof("XXX: dealing with %v ports", len(ports))
 	healthCheckPortFound := false
 	for name, port := range ports {
+		logger.Infof("Current port: %+v", port)
+
 		if port.BackendPort != 0 { // Can happen when there are no backends.
 			rule := makeNsgSecurityRule(
 				core.SecurityRuleDirectionIngress,
@@ -115,7 +118,7 @@ func generateNsgBackendIngressRules(
 				"source", *rule.Source,
 				"destinationPortRangeMin", port.BackendPort,
 				"destinationPortRangeMax", port.BackendPort,
-			).Debug("Adding node port ingress security rule on backend nsg(s)")
+			).Info("Adding node port ingress security rule on backend nsg(s)")
 			ingressRules = append(ingressRules, rule)
 
 		}
@@ -133,7 +136,7 @@ func generateNsgBackendIngressRules(
 				"source", *rule.Source,
 				"destinationPortRangeMin", port.HealthCheckerPort,
 				"destinationPortRangeMax", port.HealthCheckerPort,
-			).Debug("Adding healthcheck node port ingress security rule on backend nsg(s)")
+			).Info("Adding healthcheck node port ingress security rule on backend nsg(s)")
 			ingressRules = append(ingressRules, rule)
 		}
 	}
