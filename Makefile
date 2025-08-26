@@ -38,7 +38,7 @@ else
     VERSION   ?= ${VERSION}
 endif
 
-RELEASE = v1.32.1
+RELEASE = v1.33.0
 
 GOOS ?= linux
 ARCH ?= amd64

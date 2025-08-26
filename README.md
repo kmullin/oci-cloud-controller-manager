@@ -41,10 +41,11 @@ cloud-provider specific code out of the Kubernetes codebase.
 | v1.31.1   | v1.31                  | -                      |
 | v1.32.0   | v1.32                  | -                      |
 | v1.32.1   | v1.32                  | -                      |
+| v1.33.0   | v1.33                  | -                      |
 
 
 Note: 
-Versions older than v1.28.2 are no longer supported, new features / bug fixes will be available in v1.28.2 and later. 
+Versions older than v1.30.1 are no longer supported, new features / bug fixes will be available in v1.28.2 and later. 
 
 ## Implementation
  Currently `oci-cloud-controller-manager` implements:
