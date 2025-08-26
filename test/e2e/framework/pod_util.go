@@ -409,7 +409,7 @@ func (j *PVCTestJig) CreateAndAwaitNginxPodOrFail(ns string, pvc *v1.PersistentV
 	err = j.WaitTimeoutForPodRunningInNamespace(pod.Name, ns, slowPodStartTimeout)
 	if err != nil {
 		Logf("Pod failed to come up, logging debug info\n")
-		j.LogPodDebugInfo(namespace, pod.Name)
+		j.LogPodDebugInfo(ns, pod.Name)
 		Failf("Pod %q is not Running: %v", pod.Name, err)
 	}
 

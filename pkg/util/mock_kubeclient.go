@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"k8s.io/client-go/kubernetes/typed/resource/v1beta2"
 	"net/http"
 
 	api "k8s.io/api/core/v1"
@@ -76,6 +77,11 @@ type MockKubeClient struct {
 	CoreClient *MockCoreClient
 }
 
+func (m MockKubeClient) ResourceV1beta2() v1beta2.ResourceV1beta2Interface {
+	//TODO implement me
+	return nil
+}
+
 func (m MockKubeClient) CoordinationV1alpha2() v1alpha14.CoordinationV1alpha2Interface {
 	return nil
 }
@@ -99,6 +105,11 @@ func (m MockKubeClient) StoragemigrationV1alpha1() alpha1.StoragemigrationV1alph
 type MockCoreClient v12.CoreV1Client
 type MockCoreClientWithFailingRestClient v12.CoreV1Client
 
+func (m MockKubeClientWithFailingRestClient) ResourceV1beta2() v1beta2.ResourceV1beta2Interface {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m MockKubeClientWithFailingRestClient) CoordinationV1alpha2() v1alpha14.CoordinationV1alpha2Interface {
 	//TODO implement me
 	panic("implement me")
@@ -108,6 +119,7 @@ func (m MockKubeClientWithFailingRestClient) ResourceV1beta1() v1beta1.ResourceV
 	//TODO implement me
 	panic("implement me")
 }
+
 func (m MockKubeClientWithFailingRestClient) ResourceV1alpha3() v1alpha3.ResourceV1alpha3Interface {
 	//TODO implement me
 	panic("implement me")

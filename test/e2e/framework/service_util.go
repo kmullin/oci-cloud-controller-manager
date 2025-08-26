@@ -482,7 +482,7 @@ func (j *ServiceTestJig) UpdateService(namespace, name string, update func(*v1.S
 func (j *ServiceTestJig) UpdateServiceOrFail(namespace, name string, update func(*v1.Service)) *v1.Service {
 	svc, err := j.UpdateService(namespace, name, update)
 	if err != nil {
-		Failf(err.Error())
+		Failf("%s", err.Error())
 	}
 	return svc
 }
@@ -702,7 +702,7 @@ func (j *ServiceTestJig) RunOrFail(namespace string, tweak func(rc *v1.Replicati
 func (j *ServiceTestJig) UpdateReplicationControllerOrFail(namespace, name string, update func(controller *v1.ReplicationController)) *v1.ReplicationController {
 	rc, err := j.updateReplicationController(namespace, name, update)
 	if err != nil {
-		Failf(err.Error())
+		Failf("%s", err.Error())
 	}
 	pods, err := j.waitForPodsCreated(namespace, int(*(rc.Spec.Replicas)))
 	if err != nil {
@@ -1386,22 +1386,22 @@ func ValidateSSLConfiguration(tcpService *v1.Service, loadBalancer *client.Gener
 		if *loadBalancer.Listeners[listenername].Port == sslEnabledPorts[0] {
 			expectedSSL, err := cloudprovider.GetSSLConfiguration(sslConfig, sslConfig.BackendSetSSLSecretName, sslEnabledPorts[0], listenerSslConfigAnnotation)
 			if err != nil {
-				return false, fmt.Errorf(err.Error())
+				return false, fmt.Errorf("%s", err.Error())
 			}
 			fmt.Println("Listener Actual SSL Config for ", sslEnabledPorts[0], ":", *listener.SslConfiguration.CertificateName)
 			fmt.Println("Listener Expected SSL Config for ", sslEnabledPorts[0], ":", *expectedSSL.CertificateName)
 			fmt.Println("Listener Expected SSL Config for CipherSuiteName", sslEnabledPorts[0], ":", *expectedSSL.CipherSuiteName)
 			fmt.Println("Listener Expected SSL Config for Protocols", sslEnabledPorts[0], ":", strings.Join(expectedSSL.Protocols, ","))
 			if !reflect.DeepEqual(listener.SslConfiguration.CertificateName, expectedSSL.CertificateName) {
-				fmt.Errorf("Listener SSL Config Mismatch! Expected: %s, Got: %s", *listener.SslConfiguration.CertificateName, *expectedSSL.CertificateName)
+				_ = fmt.Errorf("Listener SSL Config Mismatch! Expected: %s, Got: %s", *listener.SslConfiguration.CertificateName, *expectedSSL.CertificateName)
 				return false, nil
 			}
 			if !reflect.DeepEqual(listener.SslConfiguration.CipherSuiteName, expectedSSL.CipherSuiteName) {
-				fmt.Errorf("Listener SSL Config Mismatch! Expected CipherSuiteName: %s, Got: %s", *expectedSSL.CipherSuiteName, *listener.SslConfiguration.CipherSuiteName)
+				_ = fmt.Errorf("Listener SSL Config Mismatch! Expected CipherSuiteName: %s, Got: %s", *expectedSSL.CipherSuiteName, *listener.SslConfiguration.CipherSuiteName)
 				return false, nil
 			}
 			if !reflect.DeepEqual(listener.SslConfiguration.Protocols, expectedSSL.Protocols) {
-				fmt.Errorf("Listener SSL Config Mismatch! Expected CipherSuite Protocols: %s, Got: %s",
+				_ = fmt.Errorf("Listener SSL Config Mismatch! Expected CipherSuite Protocols: %s, Got: %s",
 					strings.Join(expectedSSL.Protocols, ","),
 					strings.Join(listener.SslConfiguration.Protocols, ","))
 				return false, nil
@@ -1415,22 +1415,22 @@ func ValidateSSLConfiguration(tcpService *v1.Service, loadBalancer *client.Gener
 		if *loadBalancer.Listeners[backendSetName].Port == sslEnabledPorts[0] {
 			expectedSSL, err := cloudprovider.GetSSLConfiguration(sslConfig, sslConfig.BackendSetSSLSecretName, sslEnabledPorts[0], backendSslConfigAnnotation)
 			if err != nil {
-				return false, fmt.Errorf(err.Error())
+				return false, fmt.Errorf("%s", err.Error())
 			}
 			fmt.Println("BackendSet Actual SSL Config for ", sslEnabledPorts[0], ":", *backendSet.SslConfiguration.CertificateName)
 			fmt.Println("BackendSet Expected SSL Config for ", sslEnabledPorts[0], ":", *expectedSSL.CertificateName)
 			fmt.Println("BackendSet Expected SSL Config for CipherSuiteName", sslEnabledPorts[0], ":", *expectedSSL.CipherSuiteName)
 			fmt.Println("BackendSet Expected SSL Config for Protocols", sslEnabledPorts[0], ":", strings.Join(expectedSSL.Protocols, ","))
 			if !reflect.DeepEqual(backendSet.SslConfiguration.CertificateName, expectedSSL.CertificateName) {
-				fmt.Errorf("BackendSet SSL Config Mismatch! Expected: %s, Got: %s", *expectedSSL.CertificateName, *backendSet.SslConfiguration.CertificateName)
+				_ = fmt.Errorf("BackendSet SSL Config Mismatch! Expected: %s, Got: %s", *expectedSSL.CertificateName, *backendSet.SslConfiguration.CertificateName)
 				return false, nil
 			}
 			if !reflect.DeepEqual(backendSet.SslConfiguration.CipherSuiteName, expectedSSL.CipherSuiteName) {
-				fmt.Errorf("BackendSet SSL Config Mismatch! Expected CipherSuiteName: %s, Got: %s", *expectedSSL.CipherSuiteName, *backendSet.SslConfiguration.CipherSuiteName)
+				_ = fmt.Errorf("BackendSet SSL Config Mismatch! Expected CipherSuiteName: %s, Got: %s", *expectedSSL.CipherSuiteName, *backendSet.SslConfiguration.CipherSuiteName)
 				return false, nil
 			}
 			if !reflect.DeepEqual(backendSet.SslConfiguration.Protocols, expectedSSL.Protocols) {
-				fmt.Errorf("BackendSet SSL Config Mismatch! Expected CipherSuite Protocols: %s, Got: %s",
+				_ = fmt.Errorf("BackendSet SSL Config Mismatch! Expected CipherSuite Protocols: %s, Got: %s",
 					strings.Join(expectedSSL.Protocols, ","),
 					strings.Join(backendSet.SslConfiguration.Protocols, ","))
 				return false, nil

@@ -696,7 +696,7 @@ func (d BlockVolumeNodeDriver) NodeUnpublishVolume(ctx context.Context, req *csi
 			return &csi.NodeUnpublishVolumeResponse{}, nil
 		}
 		logger.With(zap.Error(rbvCheckErr)).Error("failed to check if it is a device file")
-		return nil, status.Errorf(codes.Internal, rbvCheckErr.Error())
+		return nil, status.Errorf(codes.Internal, "%s", rbvCheckErr.Error())
 	}
 
 	if acquired := d.volumeLocks.TryAcquire(req.VolumeId); !acquired {

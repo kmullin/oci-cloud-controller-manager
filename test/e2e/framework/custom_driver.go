@@ -94,7 +94,7 @@ func HelmInstall(clusterKubeconfigPath string, customHandle string) {
 		releaseNamespace,
 		os.Getenv("HELM_DRIVER"),
 		func(format string, v ...interface{}) {
-			fmt.Sprintf(format, v...)
+			_ = fmt.Sprintf(format, v...)
 		},
 	)
 	if err != nil {

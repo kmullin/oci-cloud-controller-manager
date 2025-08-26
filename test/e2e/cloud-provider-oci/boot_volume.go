@@ -77,7 +77,10 @@ var _ = Describe("Boot volume gating test", func() {
 			scName := f.CreateStorageClassOrFail(f.Namespace.Name, "blockvolume.csi.oraclecloud.com",
 				map[string]string{framework.AttachmentType: framework.AttachmentTypeISCSI},
 				pvcJig.Labels, "WaitForFirstConsumer", false, "Retain", nil)
-			pvc, bootvolumeId := pvcJig.CreateAndAwaitStaticBootVolumePVCOrFailCSI(f.ComputeClient, f.BlockStorageClient, f.Namespace.Name, compartmentId, setupF.AdLocation, framework.MinVolumeBlock, scName, nil, v1.PersistentVolumeFilesystem, v1.ReadWriteOnce, v1.ClaimPending)
+			opts := framework.Options{
+				BlockProvisionerName: setupF.BlockProvisionerName,
+			}
+			pvc, bootvolumeId := pvcJig.CreateAndAwaitStaticBootVolumePVCOrFailCSI(f.ComputeClient, f.BlockStorageClient, f.Namespace.Name, compartmentId, setupF.AdLocation, framework.MinVolumeBlock, scName, nil, v1.PersistentVolumeFilesystem, v1.ReadWriteOnce, v1.ClaimPending, opts)
 			pvcJig.NewPodForCSIWithoutWait("app1", f.Namespace.Name, pvc.Name, setupF.AdLabel)
 			err := pvcJig.WaitTimeoutForPodRunningInNamespace("app1", f.Namespace.Name, 7*time.Minute)
 			if err == nil {
