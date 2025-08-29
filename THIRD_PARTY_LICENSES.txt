@@ -46,6 +46,21 @@ SPDX:Apache-2.0
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
+dario.cat/mergo
+
+== License Type
+SPDX:BSD-3-Clause--modified-by-Google
+
+== Copyright
+Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2013 Dario Castañé. All rights reserved.
+Copyright 2009 The Go Authors. All rights reserved.
+Copyright 2013 Dario Castañé. All rights reserved.
+Copyright 2014 Dario Castañé. All rights reserved.
+
+--------------------------------- (separator) ----------------------------------
+
+== Dependency
 github.com/BurntSushi/toml
 
 == License Type
@@ -53,7 +68,6 @@ SPDX:MIT
 
 == Copyright
 Copyright (c) 2013 TOML authors
-Copyright (c) 2018 TOML authors
 Copyright 2010 The Go Authors.  All rights reserved.
 
 --------------------------------- (separator) ----------------------------------
@@ -255,7 +269,6 @@ SPDX:Apache-2.0
 == Copyright
 Copyright (C) Docker/Moby authors.
 Copyright (c) 2009 The Go Authors. All rights reserved.
-Copyright (c) 2013, The GoGo Authors. All rights reserved.
 Copyright 2012-2015 Docker, Inc.
 Copyright 2012-2017 Docker, Inc.
 Copyright 2015 The Kubernetes Authors.
@@ -288,7 +301,29 @@ See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
+github.com/containerd/errdefs
+
+== License Type
+SPDX:Apache-2.0
+
+== Copyright
+(no copyright notices found)
+
+--------------------------------- (separator) ----------------------------------
+
+== Dependency
 github.com/containerd/log
+
+== License Type
+SPDX:Apache-2.0
+
+== Copyright
+(no copyright notices found)
+
+--------------------------------- (separator) ----------------------------------
+
+== Dependency
+github.com/containerd/platforms
 
 == License Type
 SPDX:Apache-2.0
@@ -357,6 +392,7 @@ SPDX:BSD-3-Clause--modified-by-Google
 == Copyright
 Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
 Copyright (C) 2017-2024 SUSE LLC. All rights reserved.
+Copyright (C) 2017-2025 SUSE LLC. All rights reserved.
 Copyright (C) 2024 SUSE LLC. All rights reserved.
 
 --------------------------------- (separator) ----------------------------------
@@ -400,144 +436,6 @@ SPDX:Apache-2.0
 
 == Copyright
 (no copyright notices found)
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/cli
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright 2009 The Go Authors. All rights reserved.
-Copyright 2010 The Go Authors. All rights reserved.
-Copyright 2012-2017 Docker, Inc.
-Copyright 2013-2017 Docker, Inc.
-
-== Notices
-Docker
-Copyright 2012-2017 Docker, Inc.
-
-This product includes software developed at Docker, Inc. (https://www.docker.com).
-
-This product contains software (https://github.com/creack/pty) developed
-by Keith Rarick, licensed under the MIT License.
-
-The following is courtesy of our legal counsel:
-
-
-Use and transfer of Docker may be subject to certain restrictions by the
-United States and other governments.
-It is your responsibility to ensure that your use and/or transfer does not
-violate applicable laws.
-
-For more information, please see https://www.bis.doc.gov
-
-See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
-
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/distribution
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright (c) 2013 Damien Le Berrigaud and Nick Wade
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/docker
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright (c) 2009 The Go Authors. All rights reserved.
-Copyright (c) 2015 John Howard (Microsoft)
-Copyright 2012-2017 Docker, Inc.
-Copyright 2013-2018 Docker, Inc.
-copyright 2015 Docker, inc. Code released under the Apache 2.0 license. Docs released under Creative commons.
-
-== Notices
-Docker
-Copyright 2012-2017 Docker, Inc.
-
-This product includes software developed at Docker, Inc. (https://www.docker.com).
-
-This product contains software (https://github.com/creack/pty) developed
-by Keith Rarick, licensed under the MIT License.
-
-The following is courtesy of our legal counsel:
-
-
-Use and transfer of Docker may be subject to certain restrictions by the
-United States and other governments.
-It is your responsibility to ensure that your use and/or transfer does not
-violate applicable laws.
-
-For more information, please see https://www.bis.doc.gov
-
-See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
-
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/docker-credential-helpers
-
-== License Type
-SPDX:MIT
-
-== Copyright
-Copyright (c) 2016 David Calavera
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/go-connections
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright 2015 Docker, Inc.
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/docker/go-metrics
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright 2012-2015 Docker, Inc.
-Copyright 2013-2016 Docker, Inc.
-Copyright © 2016 Docker, Inc. All rights reserved, except as follows. Code is released under the Apache 2.0 license. The README.md file, and files in the "docs" folder are licensed under the Creative Commons Attribution 4.0 International License under the terms and conditions set forth in the file "LICENSE.docs". You may obtain a duplicate copy of the same license, titled CC-BY-SA-4.0, at http://creativecommons.org/licenses/by/4.0/.
-
-== Notices
-Docker
-Copyright 2012-2015 Docker, Inc.
-
-This product includes software developed at Docker, Inc. (https://www.docker.com).
-
-The following is courtesy of our legal counsel:
-
-
-Use and transfer of Docker may be subject to certain restrictions by the
-United States and other governments.
-It is your responsibility to ensure that your use and/or transfer does not
-violate applicable laws.
-
-For more information, please see https://www.bis.doc.gov
-
-See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
-
 
 --------------------------------- (separator) ----------------------------------
 
@@ -752,7 +650,8 @@ Copyright (c) 2016 Sergey Kamardin
 github.com/gofrs/flock
 
 == License Type
-=== BSD-3-Clause-4e7459b3
+=== BSD-3-Clause-ccdad8f4
+Copyright (c) 2018-2024, The Gofrs
 Copyright (c) 2015-2020, Tim Heckman
 All rights reserved.
 
@@ -785,10 +684,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 == Copyright
 Copyright (c) 2015-2020, Tim Heckman
+Copyright (c) 2018-2024, The Gofrs
 Copyright 2015 Tim Heckman. All rights reserved.
 Copyright 2018 The Go Authors. All rights reserved.
-Copyright 2018 The Gofrs. All rights reserved.
-Copyright 2019 Tim Heckman. All rights reserved. Use of this source code is
+Copyright 2018-2024 The Gofrs. All rights reserved.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -1137,17 +1036,6 @@ Copyright 2020, The Go Authors. All rights reserved.
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-github.com/google/gofuzz
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright 2014 Google Inc. All rights reserved.
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
 github.com/google/shlex
 
 == License Type
@@ -1175,20 +1063,6 @@ Copyright 2023 Google Inc.  All rights reserved.
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-github.com/gorilla/mux
-
-== License Type
-SPDX:BSD-3-Clause--modified-by-Google
-
-== Copyright
-Copyright (c) 2012-2018 The Gorilla Authors. All rights reserved.
-Copyright 2009 The Go Authors. All rights reserved.
-Copyright 2011 Gorilla Authors. All rights reserved.
-Copyright 2012 The Gorilla Authors. All rights reserved.
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
 github.com/gorilla/websocket
 
 == License Type
@@ -1203,6 +1077,7 @@ Copyright 2015 The Gorilla WebSocket Authors. All rights reserved.
 Copyright 2016 The Gorilla WebSocket Authors. All rights reserved.  Use of
 Copyright 2017 The Gorilla WebSocket Authors. All rights reserved.
 Copyright 2019 The Gorilla WebSocket Authors. All rights reserved.
+Copyright 2025 The Gorilla WebSocket Authors. All rights reserved.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -1324,21 +1199,6 @@ SPDX:MIT
 == Copyright
 Copyright (c) 2015 Huan Du
 Copyright 2015 Huan Du. All rights reserved.
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
-github.com/imdario/mergo
-
-== License Type
-SPDX:BSD-3-Clause--modified-by-Google
-
-== Copyright
-Copyright (c) 2012 The Go Authors. All rights reserved.
-Copyright (c) 2013 Dario Castañé. All rights reserved.
-Copyright 2009 The Go Authors. All rights reserved.
-Copyright 2013 Dario Castañé. All rights reserved.
-Copyright 2014 Dario Castañé. All rights reserved.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -1964,17 +1824,6 @@ Copyright (c) 2013 Mitchell Hashimoto
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-github.com/moby/locker
-
-== License Type
-SPDX:Apache-2.0
-
-== Copyright
-Copyright 2013-2018 Docker, Inc.
-
---------------------------------- (separator) ----------------------------------
-
-== Dependency
 github.com/moby/spdystream
 
 == License Type
@@ -2165,6 +2014,7 @@ SPDX:MIT
 
 == Copyright
 Copyright (c) 2013-2014 Onsi Fakhouri
+Copyright (c) 2014 Amit Kumar Gupta
 
 --------------------------------- (separator) ----------------------------------
 
@@ -2196,7 +2046,6 @@ Copyright 2016 The Linux Foundation
 Copyright 2016 The Linux Foundation.
 Copyright 2016-2022 The Linux Foundation
 Copyright 2017 The Linux Foundation
-Copyright 2018 The Linux Foundation
 
 --------------------------------- (separator) ----------------------------------
 
@@ -2313,12 +2162,16 @@ END OF TERMS AND CONDITIONS
 
 
 == Copyright
+Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.
+Copyright (c) 2013 The Go Authors. All rights reserved.
 Copyright (c) 2016, 2018, 2020, Oracle and/or its affiliates.
 Copyright (c) 2016, 2018, 2020, Oracle and/or its affiliates.  All rights reserved.
 Copyright (c) 2016, 2018, 2024, Oracle and/or its affiliates.  All rights reserved.
 Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 Copyright (c) 2016, 2023 Oracle and/or its affiliates.
 Copyright (c) 2016, 2023, Oracle and/or its affiliates.  All rights reserved.
+Copyright © 2012-2020 Mat Ryer, Tyler Bunnell and contributors.
+Copyright © 2013 The Go Authors. All rights reserved.
 
 == Notices
 Copyright (c) 2016, 2018, 2020, Oracle and/or its affiliates.
@@ -2634,6 +2487,7 @@ Copyright 2021 The Prometheus Authors
 Copyright 2022 The Prometheus Authors
 Copyright 2023 The Prometheus Authors
 Copyright 2024 The Prometheus Authors
+Copyright 2025 The Prometheus Authors
 
 == Notices
 Prometheus instrumentation library for Go applications
@@ -2689,7 +2543,6 @@ Copyright 2013 The Prometheus Authors
 Copyright 2014 The Prometheus Authors
 Copyright 2015 The Prometheus Authors
 Copyright 2016 The Prometheus Authors
-Copyright 2017 The Prometheus Authors
 Copyright 2018 The Prometheus Authors
 Copyright 2019 The Prometheus Authors
 Copyright 2020 The Prometheus Authors
@@ -3162,6 +3015,7 @@ go.uber.org/zap
 SPDX:MIT
 
 == Copyright
+Copyright (c) "*" Uber Technologies, Inc.")
 Copyright (c) 2016 Uber Technologies, Inc.
 Copyright (c) 2016, 2017 Uber Technologies, Inc.
 Copyright (c) 2016-2017 Uber Technologies, Inc.
@@ -3228,6 +3082,7 @@ Copyright 2021 The Go Authors. All rights reserved.
 Copyright 2022 The Go Authors. All rights reserved.
 Copyright 2023 The Go Authors. All rights reserved.
 Copyright 2024 The Go Authors. All rights reserved.
+Copyright 2025 The Go Authors. All rights reserved.
 
 == Patents
 Additional IP Rights Grant (Patents)
@@ -3391,6 +3246,7 @@ Copyright 2021 The Go Authors. All rights reserved.
 Copyright 2022 The Go Authors. All rights reserved.
 Copyright 2023 The Go Authors. All rights reserved.
 Copyright 2024 The Go Authors. All rights reserved.
+Copyright 2025 The Go Authors. All rights reserved.
 
 == Patents
 Additional IP Rights Grant (Patents)
@@ -3514,7 +3370,6 @@ Copyright 2013 The Go Authors. All rights reserved.
 Copyright 2016 The Go Authors. All rights reserved.
 Copyright 2017 The Go Authors. All rights reserved.
 Copyright 2019 The Go Authors. All rights reserved.
-Copyright 2023 The Go Authors. All rights reserved.
 
 == Patents
 Additional IP Rights Grant (Patents)
@@ -3884,6 +3739,7 @@ Copyright 2021 gRPC authors.
 Copyright 2022 gRPC authors.
 Copyright 2023 gRPC authors.
 Copyright 2024 gRPC authors.
+Copyright 2025 gRPC authors.
 
 == Notices
 Copyright 2014 gRPC authors.
@@ -3923,6 +3779,7 @@ Copyright 2023 Google Inc.  All rights reserved.
 Copyright 2023 The Go Authors. All rights reserved.
 Copyright 2024 Google Inc.  All rights reserved.
 Copyright 2024 The Go Authors. All rights reserved.
+Copyright 2025 The Go Authors. All rights reserved.
 
 == Patents
 Additional IP Rights Grant (Patents)
@@ -4215,6 +4072,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4258,6 +4116,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4279,6 +4138,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4320,6 +4180,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4361,6 +4222,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4412,6 +4274,7 @@ SPDX:Apache-2.0
 Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4480,6 +4343,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Go Authors. All rights reserved.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4515,6 +4379,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4533,6 +4398,7 @@ Copyright 2020 The Kubernetes Authors.
 Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4561,6 +4427,7 @@ Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
 Copyright 2023 The Kubernetes Authors.
 Copyright 2024 The Kubernetes Authors.
+Copyright 2025 The Kubernetes Authors.
 
 --------------------------------- (separator) ----------------------------------
 
@@ -4607,7 +4474,7 @@ Copyright 2024 The Kubernetes Authors.
 --------------------------------- (separator) ----------------------------------
 
 == Dependency
-oras.land/oras-go
+oras.land/oras-go/v2
 
 == License Type
 SPDX:Apache-2.0
@@ -4920,6 +4787,48 @@ Copyright 2019 The Kubernetes Authors.
 Copyright 2020 The Kubernetes Authors.
 Copyright 2021 The Kubernetes Authors.
 Copyright 2022 The Kubernetes Authors.
+
+--------------------------------- (separator) ----------------------------------
+
+== Dependency
+sigs.k8s.io/randfill
+
+== License Type
+SPDX:Apache-2.0
+
+== Copyright
+Copyright 2014 Google Inc. All rights reserved.
+Copyright 2014 The gofuzz Authors
+Copyright 2014 The gofuzz Authors.
+Copyright 2025 The Kubernetes Authors
+Copyright 2025 The Kubernetes Authors.
+
+== Notices
+When donating the randfill project to the CNCF, we could not reach all the
+gofuzz contributors to sign the CNCF CLA. As such, according to the CNCF rules
+to donate a repository, we must add a NOTICE referencing section 7 of the CLA
+with a list of developers who could not be reached.
+
+`7. Should You wish to submit work that is not Your original creation, You may
+submit it to the Foundation separately from any Contribution, identifying the
+complete details of its source and of any license or other restriction
+(including, but not limited to, related patents, trademarks, and license
+agreements) of which you are personally aware, and conspicuously marking the
+work as "Submitted on behalf of a third-party: [named here]".`
+
+Submitted on behalf of a third-party: @dnephin (Daniel Nephin)
+Submitted on behalf of a third-party: @AlekSi (Alexey Palazhchenko)
+Submitted on behalf of a third-party: @bbigras (Bruno Bigras)
+Submitted on behalf of a third-party: @samirkut (Samir)
+Submitted on behalf of a third-party: @posener (Eyal Posener)
+Submitted on behalf of a third-party: @Ashikpaul (Ashik Paul)
+Submitted on behalf of a third-party: @kwongtailau (Kwongtai)
+Submitted on behalf of a third-party: @ericcornelissen (Eric Cornelissen)
+Submitted on behalf of a third-party: @eclipseo (Robert-André Mauchin)
+Submitted on behalf of a third-party: @yanzhoupan (Andrew Pan)
+Submitted on behalf of a third-party: @STRRL (Zhiqiang ZHOU)
+Submitted on behalf of a third-party: @disconnect3d (Disconnect3d)
+
 
 --------------------------------- (separator) ----------------------------------
 
@@ -5864,5 +5773,5 @@ the Mozilla Public License, v. 2.0.
 
 
 === ATTRIBUTION-HELPER-GENERATED:
-=== Attribution helper version: {Major:0 Minor:11 GitVersion:2a434e4d GitCommit:2a434e4d7eea22d4dfd2d1cf04909239d05562b1 GitTreeState:clean BuildDate:2024-12-16T20:09:06Z GoVersion:go1.21.13 Compiler:gc Platform:darwin/arm64}
-=== License file based on go.mod with md5 sum:  18fc380a075697dda4318766ab152b00
+=== Attribution helper version: {Major:0 Minor:11 GitVersion: GitCommit: GitTreeState:dirty BuildDate:1970-01-01T00:00:00Z GoVersion:go1.19.3 Compiler:gc Platform:darwin/arm64}
+=== License file based on go.mod with md5 sum:  7b015272ffe062302b87ddc9a3701a0e
