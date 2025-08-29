@@ -699,7 +699,7 @@ var _ = Describe("CSI Ultra High Performance Volumes", func() {
 				map[string]string{framework.AttachmentType: framework.AttachmentTypeParavirtualized, csi_util.VpusPerGB: "30"},
 				pvcJig.Labels, "WaitForFirstConsumer", true, "Delete", nil)
 
-opts := framework.Options{
+			opts := framework.Options{
 				BlockProvisionerName: setupF.BlockProvisionerName,
 			}
 			pvc, volumeId := pvcJig.CreateAndAwaitStaticPVCOrFailCSI(f.BlockStorageClient, f.Namespace.Name, framework.MinVolumeBlock, 30, scName, setupF.AdLocation, compartmentId, nil, v1.PersistentVolumeFilesystem, v1.ReadWriteOnce, v1.ClaimPending, opts)

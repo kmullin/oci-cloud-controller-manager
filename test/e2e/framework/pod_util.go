@@ -580,6 +580,7 @@ func (j *PVCTestJig) logPodDetails(ns string, pod *v1.Pod) {
 	fmt.Printf("Conditions: %+v\n", pod.Status.Conditions)
 	fmt.Printf("Labels: %+v\n", pod.Labels)
 	fmt.Printf("Annotations: %+v\n", pod.Annotations)
+	fmt.Printf("Spec: %+v\n", pod.Spec)
 	fmt.Printf("Containers:\n")
 	for _, container := range pod.Spec.Containers {
 		fmt.Printf("  Name: %s\n  Image: %s\n  Ready: %v\n", container.Name, container.Image, container.ReadinessProbe)

@@ -42,7 +42,6 @@ import (
 	csi_util "github.com/oracle/oci-cloud-controller-manager/pkg/csi-util"
 	"github.com/oracle/oci-cloud-controller-manager/pkg/csi/driver"
 	"github.com/oracle/oci-cloud-controller-manager/pkg/oci/client"
-	"github.com/oracle/oci-cloud-controller-manager/pkg/volume/provisioner/plugin"
 )
 
 const (
@@ -930,6 +929,17 @@ func (j *PVCTestJig) NewPodForCSI(name string, namespace string, claimName strin
 		Failf("Unsupported volumeMode: %s", volumeMode)
 	}
 
+	podSpec := v1.PodSpec{
+		Containers: containers,
+		Volumes:    volumes,
+	}
+
+	if adLabel != "" {
+		podSpec.NodeSelector = map[string]string{
+			v1.LabelTopologyZone: adLabel,
+		}
+	}
+
 	pod, err := j.KubeClient.CoreV1().Pods(namespace).Create(context.Background(), &v1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Pod",
@@ -939,13 +949,7 @@ func (j *PVCTestJig) NewPodForCSI(name string, namespace string, claimName strin
 			GenerateName: j.Name,
 			Namespace:    namespace,
 		},
-		Spec: v1.PodSpec{
-			Containers: containers,
-			Volumes:    volumes,
-			NodeSelector: map[string]string{
-				plugin.LabelZoneFailureDomain: adLabel,
-			},
-		},
+		Spec: podSpec,
 	}, metav1.CreateOptions{})
 	if err != nil {
 		Failf("Pod %q Create API error: %v", pod.Name, err)
@@ -1162,6 +1166,26 @@ func (j *PVCTestJig) NewPodForCSIClone(name string, namespace string, claimName 
 		}
 	}
 
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{container},
+		Volumes: []v1.Volume{
+			{
+				Name: "persistent-storage",
+				VolumeSource: v1.VolumeSource{
+					PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
+						ClaimName: claimName,
+					},
+				},
+			},
+		},
+	}
+
+	if adLabel != "" {
+		podSpec.NodeSelector = map[string]string{
+			v1.LabelTopologyZone: adLabel,
+		}
+	}
+
 	pod, err := j.KubeClient.CoreV1().Pods(namespace).Create(context.Background(), &v1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Pod",
@@ -1171,22 +1195,7 @@ func (j *PVCTestJig) NewPodForCSIClone(name string, namespace string, claimName 
 			GenerateName: j.Name,
 			Namespace:    namespace,
 		},
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{container},
-			Volumes: []v1.Volume{
-				{
-					Name: "persistent-storage",
-					VolumeSource: v1.VolumeSource{
-						PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
-							ClaimName: claimName,
-						},
-					},
-				},
-			},
-			NodeSelector: map[string]string{
-				v1.LabelTopologyZone: adLabel,
-			},
-		},
+		Spec: podSpec,
 	}, metav1.CreateOptions{})
 	if err != nil {
 		Failf("Pod %q Create API error: %v", pod.Name, err)
@@ -1206,6 +1215,39 @@ func (j *PVCTestJig) NewPodForCSIClone(name string, namespace string, claimName 
 func (j *PVCTestJig) NewPodForCSIWithoutWait(name string, namespace string, claimName string, adLabel string) string {
 	By("Creating a pod with the claiming PVC created by CSI")
 
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name:    name,
+				Image:   centos,
+				Command: []string{"/bin/sh"},
+				Args:    []string{"-c", "echo 'Hello World' > /data/testdata.txt; while true; do echo $(date -u) >> /data/out.txt; sleep 5; done"},
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name:      "persistent-storage",
+						MountPath: "/data",
+					},
+				},
+			},
+		},
+		Volumes: []v1.Volume{
+			{
+				Name: "persistent-storage",
+				VolumeSource: v1.VolumeSource{
+					PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
+						ClaimName: claimName,
+					},
+				},
+			},
+		},
+	}
+
+	if adLabel != "" {
+		podSpec.NodeSelector = map[string]string{
+			v1.LabelTopologyZone: adLabel,
+		}
+	}
+
 	pod, err := j.KubeClient.CoreV1().Pods(namespace).Create(context.Background(), &v1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Pod",
@@ -1215,35 +1257,7 @@ func (j *PVCTestJig) NewPodForCSIWithoutWait(name string, namespace string, clai
 			GenerateName: j.Name,
 			Namespace:    namespace,
 		},
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{
-				{
-					Name:    name,
-					Image:   centos,
-					Command: []string{"/bin/sh"},
-					Args:    []string{"-c", "echo 'Hello World' > /data/testdata.txt; while true; do echo $(date -u) >> /data/out.txt; sleep 5; done"},
-					VolumeMounts: []v1.VolumeMount{
-						{
-							Name:      "persistent-storage",
-							MountPath: "/data",
-						},
-					},
-				},
-			},
-			Volumes: []v1.Volume{
-				{
-					Name: "persistent-storage",
-					VolumeSource: v1.VolumeSource{
-						PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
-							ClaimName: claimName,
-						},
-					},
-				},
-			},
-			NodeSelector: map[string]string{
-				v1.LabelTopologyZone: adLabel,
-			},
-		},
+		Spec: podSpec,
 	}, metav1.CreateOptions{})
 	if err != nil {
 		Failf("Pod %q Create API error: %v", pod.Name, err)
