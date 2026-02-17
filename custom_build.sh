@@ -8,6 +8,7 @@ VERSION=${VERSION:-$2}
 export CI_IMAGE_REGISTRY=$REGISTRY/oracle
 export OSS_REGISTRY=$REGISTRY/oracle
 export VERSION
+export DOCKER_BUILDKIT=0
 
 # build it and push it
 make build image docker-push-all
