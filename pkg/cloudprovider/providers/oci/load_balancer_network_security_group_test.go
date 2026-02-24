@@ -28,6 +28,20 @@ import (
 	k8sports "k8s.io/kubernetes/pkg/cluster/ports"
 )
 
+type ruleByPort []core.SecurityRule
+
+func (r ruleByPort) Len() int      { return len(r) }
+func (r ruleByPort) Swap(i, j int) { r[i], r[j] = r[j], r[i] }
+func (r ruleByPort) Less(i, j int) bool {
+	if r[i].TcpOptions != nil && r[j].TcpOptions != nil {
+		return *r[i].TcpOptions.DestinationPortRange.Min < *r[j].TcpOptions.DestinationPortRange.Min
+	}
+	if r[i].UdpOptions != nil && r[j].UdpOptions != nil {
+		return *r[i].UdpOptions.DestinationPortRange.Min < *r[j].UdpOptions.DestinationPortRange.Min
+	}
+	return false
+}
+
 var (
 	addNetworkSecurityGroupSecurityRules = map[string]*core.AddNetworkSecurityGroupSecurityRulesResponse{
 		"id": {
@@ -140,7 +154,7 @@ func TestGenerateLbNsgIngressRules(t *testing.T) {
 				"0.0.0.0/0",
 				"1.1.1.1/1",
 			},
-			port: map[string]portSpec{"test": {
+			port: map[string]portSpec{"TCP-80": {
 				ListenerPort:      80,
 				BackendPort:       0,
 				HealthCheckerPort: 0,
@@ -177,14 +191,83 @@ func TestGenerateLbNsgIngressRules(t *testing.T) {
 				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 443, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
 			},
 		},
+		{
+			name: "source cidr's multiple protocol",
+			sourceCIDRs: []string{
+				"0.0.0.0/0",
+				"1.1.1.1/1",
+			},
+			port: map[string]portSpec{
+				"TCP-80": {
+					ListenerPort:      80,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+				"TCP-443": {
+					ListenerPort:      443,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+				"UDP-420": {
+					ListenerPort:      420,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+			},
+			lbId: "lbocid",
+			expected: []core.SecurityRule{
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 80, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 80, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 443, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 443, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 420, ProtocolUDP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 420, ProtocolUDP, core.SecurityRuleSourceTypeCidrBlock),
+			},
+		},
+		{
+			name: "source cidr's multiple protocol shared",
+			sourceCIDRs: []string{
+				"0.0.0.0/0",
+				"1.1.1.1/1",
+			},
+			port: map[string]portSpec{
+				"TCP-80": {
+					ListenerPort:      80,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+				"TCP-443": {
+					ListenerPort:      443,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+				fmt.Sprintf("%v-42000", ProtocolTypeMixed): {
+					ListenerPort:      42000,
+					BackendPort:       0,
+					HealthCheckerPort: 0,
+				},
+			},
+			lbId: "lbocid",
+			expected: []core.SecurityRule{
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 80, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 80, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 443, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 443, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 42000, ProtocolUDP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "0.0.0.0/0", "lbocid", 42000, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 42000, ProtocolUDP, core.SecurityRuleSourceTypeCidrBlock),
+				makeNsgSecurityRule(core.SecurityRuleDirectionIngress, "1.1.1.1/1", "lbocid", 42000, ProtocolTCP, core.SecurityRuleSourceTypeCidrBlock),
+			},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			rules := generateNsgLoadBalancerIngressRules(zap.S(), tc.sourceCIDRs, tc.port, tc.lbId)
-			sort.Slice(rules, func(i, j int) bool {
-				return *rules[i].TcpOptions.DestinationPortRange.Min < *rules[j].TcpOptions.DestinationPortRange.Min
-			})
+			//sort.Slice(rules, func(i, j int) bool {
+			//	return *rules[i].TcpOptions.DestinationPortRange.Min < *rules[j].TcpOptions.DestinationPortRange.Min
+			//})
+			sort.Sort(ruleByPort(rules))
 			if !reflect.DeepEqual(rules, tc.expected) {
 				t.Errorf("expected rules\n%+v\nbut got\n%+v", tc.expected, rules)
 			}
@@ -253,6 +336,34 @@ func TestGenerateLbNsgEgressRules(t *testing.T) {
 				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 10257, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
 				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 30001, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
 				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 30002, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
+			},
+		},
+		{
+			name: "new egress single backend nsg ocid dual protocol",
+			desiredPort: map[string]portSpec{
+				"TCP-80": {
+					ListenerPort:      0,
+					BackendPort:       30001,
+					HealthCheckerPort: 10257,
+				},
+				"TCP-443": {
+					ListenerPort:      0,
+					BackendPort:       30002,
+					HealthCheckerPort: 10257,
+				},
+				"UDP-420": {
+					ListenerPort:      0,
+					BackendPort:       30003,
+					HealthCheckerPort: 10257,
+				},
+			},
+			backendNsgIds: []string{"backendNSGocid"},
+			lbId:          "lbocid",
+			expected: []core.SecurityRule{
+				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 10257, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
+				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 30001, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
+				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 30002, ProtocolTCP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
+				makeNsgSecurityRule(core.SecurityRuleDirectionEgress, "backendNSGocid", "lbocid", 30003, ProtocolUDP, core.SecurityRuleSourceTypeNetworkSecurityGroup),
 			},
 		},
 		{

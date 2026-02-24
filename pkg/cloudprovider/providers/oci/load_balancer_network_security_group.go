@@ -17,6 +17,7 @@ package oci
 import (
 	"context"
 	"fmt"
+	"iter"
 	"reflect"
 	"strings"
 
@@ -56,12 +57,23 @@ type securityRuleComponents struct {
 	ipFamilies       []string
 }
 
-// getProtocolFromName returns the protocol from the listener name
-func getProtocolFromName(name string) int {
-	if strings.HasPrefix(name, "UDP") {
-		return ProtocolUDP
+// selectProto returns an iterator over the protocol(s) used for a given name
+func selectProto(name string) iter.Seq[int] {
+	return func(yield func(int) bool) {
+		switch {
+		case strings.HasPrefix(name, ProtocolTypeMixed): // first case
+			if !yield(ProtocolUDP) {
+				return
+			}
+			_ = yield(ProtocolTCP)
+		case strings.HasPrefix(name, "UDP"):
+			_ = yield(ProtocolUDP)
+		case strings.HasPrefix(name, "TCP"):
+			_ = yield(ProtocolTCP)
+		default:
+			return
+		}
 	}
-	return ProtocolTCP
 }
 
 // generateNsgBackendIngressRules is a helper method to generate the ingress rules for the backend NSG
@@ -80,27 +92,29 @@ func generateNsgBackendIngressRules(
 		for name, port := range ports {
 			if port.BackendPort != 0 {
 				for _, sourceCIDR := range sourceCIDRs {
-					nlbRule := makeNsgSecurityRule(
-						core.SecurityRuleDirectionIngress,
-						sourceCIDR,
-						serviceUid,
-						port.BackendPort,
-						getProtocolFromName(name),
-						core.SecurityRuleSourceTypeCidrBlock,
-					)
-					logger.With(
-						"source", *nlbRule.Source,
-						"destinationPortRangeMin", port.BackendPort,
-						"destinationPortRangeMax", port.BackendPort,
-					).Debug("Adding node port ingress security rule on backend nsg(s)")
-					ingressRules = append(ingressRules, nlbRule)
+					for proto := range selectProto(name) {
+						nlbRule := makeNsgSecurityRule(
+							core.SecurityRuleDirectionIngress,
+							sourceCIDR,
+							serviceUid,
+							port.BackendPort,
+							proto,
+							core.SecurityRuleSourceTypeCidrBlock,
+						)
+						logger.With(
+							"source", *nlbRule.Source,
+							"destinationPortRangeMin", port.BackendPort,
+							"destinationPortRangeMax", port.BackendPort,
+						).Debug("Adding node port ingress security rule on backend nsg(s)")
+						ingressRules = append(ingressRules, nlbRule)
+					}
 				}
 			}
 		}
 	}
 
 	logger.Infof("XXX: dealing with %v ports", len(ports))
-	appendRule := func(port int, protocol int) {
+	appendRule := func(port, protocol int, msg string) {
 		r := makeNsgSecurityRule(
 			core.SecurityRuleDirectionIngress,
 			frontendNsgId,
@@ -113,7 +127,7 @@ func generateNsgBackendIngressRules(
 			"source", *r.Source,
 			"destinationPortRangeMin", port,
 			"destinationPortRangeMax", port,
-		).Info("Adding node port ingress security rule on backend nsg(s)")
+		).Info(msg)
 		ingressRules = append(ingressRules, r)
 	}
 	healthCheckPortFound := false
@@ -121,34 +135,17 @@ func generateNsgBackendIngressRules(
 		logger.Infof("Current port: %q: %+v", name, port)
 
 		if port.BackendPort != 0 { // Can happen when there are no backends.
-			if strings.HasPrefix(name, ProtocolTypeMixed) {
-				for _, p := range []int{ProtocolTCP, ProtocolUDP} {
-					appendRule(port.BackendPort, p)
-				}
-			} else {
-				appendRule(
-					port.BackendPort,
-					getProtocolFromName(name),
-				)
+			for proto := range selectProto(name) {
+				appendRule(port.BackendPort, proto, "Adding node port ingress security rule on backend nsg(s)")
 			}
 		}
 		if !healthCheckPortFound && port.HealthCheckerPort != 0 {
-			// XXX: heath check on "TCP_AND_UDP" uses TCP
 			healthCheckPortFound = true
-			rule := makeNsgSecurityRule(
-				core.SecurityRuleDirectionIngress,
-				frontendNsgId,
-				serviceUid,
+			appendRule(
 				port.HealthCheckerPort,
-				getProtocolFromName(name),
-				core.SecurityRuleSourceTypeNetworkSecurityGroup,
+				ProtocolTCP, // XXX: heath check port is TCP
+				"Adding healthcheck node port ingress security rule on backend nsg(s)",
 			)
-			logger.With(
-				"source", *rule.Source,
-				"destinationPortRangeMin", port.HealthCheckerPort,
-				"destinationPortRangeMax", port.HealthCheckerPort,
-			).Info("Adding healthcheck node port ingress security rule on backend nsg(s)")
-			ingressRules = append(ingressRules, rule)
 		}
 	}
 	return ingressRules
@@ -168,40 +165,24 @@ func generateNsgLoadBalancerIngressRules(
 		return ingressRules
 	}
 
-	appendRule := func(cidr string, port, protocol int) {
-		rule := makeNsgSecurityRule(
-			core.SecurityRuleDirectionIngress,
-			cidr,
-			serviceUid,
-			port,
-			protocol,
-			core.SecurityRuleSourceTypeCidrBlock,
-		)
-		logger.With(
-			"source", *rule.Source,
-			"destinationPortRangeMin", port,
-			"destinationPortRangeMax", port,
-		).Debug("Adding load balancer ingress security rule for frontend nsg")
-		ingressRules = append(ingressRules, rule)
-	}
-
 	for name, port := range ports {
 		if port.ListenerPort != 0 {
 			for _, cidr := range sourceCIDRs {
-				if strings.HasPrefix(name, ProtocolTypeMixed) {
-					for _, p := range []int{ProtocolUDP, ProtocolTCP} {
-						appendRule(
-							cidr,
-							port.ListenerPort,
-							p,
-						)
-					}
-				} else {
-					appendRule(
+				for proto := range selectProto(name) {
+					rule := makeNsgSecurityRule(
+						core.SecurityRuleDirectionIngress,
 						cidr,
+						serviceUid,
 						port.ListenerPort,
-						getProtocolFromName(name),
+						proto,
+						core.SecurityRuleSourceTypeCidrBlock,
 					)
+					logger.With(
+						"source", *rule.Source,
+						"destinationPortRangeMin", port.ListenerPort,
+						"destinationPortRangeMax", port.ListenerPort,
+					).Debug("Adding load balancer ingress security rule for frontend nsg")
+					ingressRules = append(ingressRules, rule)
 				}
 			}
 		}
@@ -218,7 +199,7 @@ func generateNsgLoadBalancerEgressRules(logger *zap.SugaredLogger, ports map[str
 		return egressRules
 	}
 
-	appendRule := func(backendNsgId string, port, protocol int) {
+	appendRule := func(backendNsgId string, port, protocol int, msg string) {
 		rule := makeNsgSecurityRule(
 			core.SecurityRuleDirectionEgress,
 			backendNsgId,
@@ -231,29 +212,21 @@ func generateNsgLoadBalancerEgressRules(logger *zap.SugaredLogger, ports map[str
 			"destination", *rule.Destination,
 			"destinationPortRangeMin", port,
 			"destinationPortRangeMax", port,
-		).Debug("Adding load balancer egress security rule with backend port on frontend nsg")
+		).Debug(msg)
 		egressRules = append(egressRules, rule)
 	}
 
-	rule := core.SecurityRule{}
 	if len(backendNsgIds) != 0 {
 		healthCheckPortFound := false
 		for name, port := range ports {
 			if port.BackendPort != 0 {
 				for _, backendNsgId := range backendNsgIds {
-					if strings.HasPrefix(name, ProtocolTypeMixed) {
-						for _, p := range []int{ProtocolTCP, ProtocolUDP} {
-							appendRule(
-								backendNsgId,
-								port.BackendPort,
-								p,
-							)
-						}
-					} else {
+					for proto := range selectProto(name) {
 						appendRule(
 							backendNsgId,
 							port.BackendPort,
-							getProtocolFromName(name),
+							proto,
+							"Adding load balancer egress security rule with backend port on frontend nsg",
 						)
 					}
 				}
@@ -261,20 +234,12 @@ func generateNsgLoadBalancerEgressRules(logger *zap.SugaredLogger, ports map[str
 			if !healthCheckPortFound && port.HealthCheckerPort != 0 {
 				healthCheckPortFound = true
 				for _, backendNsgId := range backendNsgIds {
-					rule = makeNsgSecurityRule(
-						core.SecurityRuleDirectionEgress,
+					appendRule(
 						backendNsgId,
-						serviceUid,
 						port.HealthCheckerPort,
-						getProtocolFromName(name),
-						core.SecurityRuleSourceTypeNetworkSecurityGroup,
+						ProtocolTCP,
+						"Adding load balancer egress security rule with healthcheck port on frontend nsg",
 					)
-					egressRules = append(egressRules, rule)
-					logger.With(
-						"destination", *rule.Destination,
-						"destinationPortRangeMin", port.HealthCheckerPort,
-						"destinationPortRangeMax", port.HealthCheckerPort,
-					).Debug("Adding load balancer egress security rule with healthcheck port on frontend nsg")
 				}
 			}
 
